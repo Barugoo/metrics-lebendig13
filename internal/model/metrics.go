@@ -1,5 +1,9 @@
 package models
 
+import (
+	"errors"
+)
+
 const (
 	Counter = "counter"
 	Gauge   = "gauge"
@@ -16,4 +20,43 @@ type Metrics struct {
 	Delta *int64   `json:"delta,omitempty"`
 	Value *float64 `json:"value,omitempty"`
 	Hash  string   `json:"hash,omitempty"`
+}
+
+type MemStorage struct {
+	metrics map[string]Metrics
+}
+
+func NewMemStorage() *MemStorage {
+	return &MemStorage{
+		metrics: make(map[string]Metrics),
+	}
+}
+
+func (ms *MemStorage) InsertOrUpdate(m Metrics) error {
+	switch m.MType {
+	case Counter:
+		if m.Delta == nil {
+			return errors.New("Counter: nil value, nothing to change")
+		}
+		currentMetric, exists := ms.metrics[m.ID]
+		if exists && currentMetric.Delta != nil {
+			newMetric := *currentMetric.Delta + *m.Delta
+			m.Delta = &newMetric
+		}
+		ms.metrics[m.ID] = m
+	case Gauge:
+		if m.Value == nil {
+			return errors.New("Gauge: nil value, nothing to change")
+		}
+		ms.metrics[m.ID] = m
+	default:
+		return errors.New("Unknown metric type")
+	}
+
+	return nil
+}
+
+func (ms *MemStorage) Get(id string) (Metrics, bool) {
+	currentMetric, exists := ms.metrics[id]
+	return currentMetric, exists
 }
