@@ -169,7 +169,7 @@ func (s *Server) GetMetricHandler(res http.ResponseWriter, req *http.Request) {
 		result = strconv.FormatInt(*metric.Delta, 10)
 	}
 	if metric.MType == models.Gauge {
-		result = strconv.FormatFloat(*metric.Value, 'f', 10, 64)
+		result = strconv.FormatFloat(*metric.Value, 'f', 3, 64)
 	}
 
 	res.Header().Set("Content-Type", "text/plain; charset=utf-8")
