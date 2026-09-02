@@ -37,7 +37,7 @@ func (ms *MemStorage) InsertOrUpdate(m Metrics) error {
 	switch m.MType {
 	case Counter:
 		if m.Delta == nil {
-			return errors.New("Counter: nil value, nothing to change")
+			return errors.New("counter: nil value, nothing to change")
 		}
 		currentMetric, exists := ms.metrics[m.ID]
 		if exists && currentMetric.Delta != nil {
@@ -47,11 +47,11 @@ func (ms *MemStorage) InsertOrUpdate(m Metrics) error {
 		ms.metrics[m.ID] = m
 	case Gauge:
 		if m.Value == nil {
-			return errors.New("Gauge: nil value, nothing to change")
+			return errors.New("gauge: nil value, nothing to change")
 		}
 		ms.metrics[m.ID] = m
 	default:
-		return errors.New("Unknown metric type")
+		return errors.New("unknown metric type")
 	}
 
 	return nil
